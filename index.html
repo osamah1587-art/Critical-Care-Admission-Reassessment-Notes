@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ICU Note"/>
+<meta name="theme-color" content="#0a1628"/>
+<title>ICU Assessment Note — KAMC</title>
+<link rel="manifest" href="manifest.json"/>
+<style>
+:root {
+  --navy: #0a1628;
+  --navy2: #112240;
+  --cyan: #0ea5e9;
+  --cyan-light: #bae6fd;
+  --slate: #1e293b;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #0f172a;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --success: #10b981;
+  --radius: 8px;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+
+/* ── HEADER ── */
+.app-header{background:var(--navy);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.header-brand{display:flex;flex-direction:column;}
+.header-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--cyan);text-transform:uppercase;}
+.header-title{font-size:17px;font-weight:800;line-height:1.2;}
+.header-actions{display:flex;gap:8px;flex-shrink:0;}
+.btn{border:none;border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-cyan{background:var(--cyan);color:#fff;}
+.btn-slate{background:var(--slate);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--cyan);color:var(--cyan);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-success{background:var(--success);color:#fff;}
+
+/* ── TABS ── */
+.tab-bar{background:var(--navy2);border-bottom:2px solid var(--slate);}
+.tab-inner{max-width:900px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none;}
+.tab-inner::-webkit-scrollbar{display:none;}
+.tab{padding:10px 14px;font-size:12px;font-weight:600;color:#94a3b8;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.tab:hover:not(.active){color:#cbd5e1;}
+
+/* ── MAIN ── */
+.main{max-width:900px;margin:0 auto;padding:16px;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── PATIENT STRIP ── */
+.patient-strip{background:var(--navy2);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.patient-strip input{background:transparent;border:none;border-bottom:1.5px solid #334155;color:#fff;font-size:13px;padding:3px 0;outline:none;min-width:80px;}
+.patient-strip input::placeholder{color:#475569;}
+.patient-strip label{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--cyan);text-transform:uppercase;display:flex;flex-direction:column;gap:3px;}
+.strip-divider{width:1px;height:36px;background:#334155;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid #e2e8f0;margin-bottom:14px;overflow:hidden;}
+.card-head{background:var(--navy);color:#fff;padding:9px 14px;display:flex;align-items:center;gap:10px;}
+.card-num{background:var(--cyan);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.card-title{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.card-body{padding:14px;}
+
+/* ── FORM ELEMENTS ── */
+.field-group{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.field-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.field-input{border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;font-family:var(--font);width:100%;background:#fff;color:var(--text);transition:border-color .15s;outline:none;}
+.field-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(14,165,233,.12);}
+textarea.field-input{resize:vertical;min-height:52px;}
+
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.row:last-child{margin-bottom:0;}
+
+.cb-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.cb-item{display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:5px;border:1.5px solid var(--border);background:#f8fafc;transition:all .15s;user-select:none;}
+.cb-item:hover{border-color:var(--cyan);background:#f0f9ff;}
+.cb-item.checked{border-color:var(--cyan);background:var(--cyan-light);font-weight:600;color:var(--navy);}
+.cb-item input{display:none;}
+
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.radio-item{display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;padding:4px 10px;border-radius:5px;border:1.5px solid var(--border);background:#f8fafc;transition:all .15s;user-select:none;}
+.radio-item:hover{border-color:var(--cyan);}
+.radio-item.selected{border-color:var(--cyan);background:var(--cyan);color:#fff;font-weight:700;}
+.radio-item input{display:none;}
+
+.sub-label{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;margin-top:2px;display:flex;align-items:center;gap:6px;}
+.sub-label::after{content:'';flex:1;height:1px;background:#e2e8f0;}
+
+.conditional{background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;padding:10px;margin-top:6px;}
+
+/* ── PROBLEM LIST ── */
+.problem-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.problem-num{background:var(--navy);color:var(--cyan);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+
+/* ── PLAN ROWS ── */
+.plan-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.plan-tag{font-size:11px;font-weight:800;color:#fff;background:var(--navy);border-radius:4px;padding:4px 8px;min-width:68px;text-align:center;flex-shrink:0;}
+
+/* ── ACTION BAR ── */
+.action-bar{background:var(--card);border-top:1px solid #e2e8f0;padding:12px 16px;position:sticky;bottom:0;z-index:50;}
+.action-inner{max-width:900px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── HIS OUTPUT ── */
+#his-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;}
+#his-modal.open{display:flex;}
+.modal-box{background:#fff;border-radius:12px;padding:20px;max-width:680px;width:calc(100% - 32px);max-height:85vh;display:flex;flex-direction:column;gap:12px;}
+.modal-title{font-size:15px;font-weight:800;color:var(--navy);}
+#his-text{font-family:'Courier New',monospace;font-size:11px;line-height:1.6;border:1px solid var(--border);border-radius:6px;padding:12px;flex:1;overflow-y:auto;white-space:pre-wrap;background:#f8fafc;min-height:300px;max-height:50vh;}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ── SAVED NOTES LIST ── */
+.note-card{background:var(--card);border:1px solid #e2e8f0;border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.note-info{flex:1;}
+.note-name{font-weight:700;font-size:14px;}
+.note-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.note-actions{display:flex;gap:6px;}
+.empty-state{text-align:center;color:var(--muted);padding:40px 20px;font-size:13px;}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{height:3px;background:#e2e8f0;border-radius:2px;margin-bottom:14px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--cyan);border-radius:2px;transition:width .4s;}
+
+/* ── PRINT ── */
+@media print {
+  .app-header,.tab-bar,.action-bar,.no-print{display:none!important;}
+  body{background:#fff;font-size:11px;}
+  .main{padding:0;max-width:100%;}
+  .page{display:block!important;}
+  .patient-strip{background:#f1f5f9;border-radius:0;}
+  .patient-strip input{color:#000;border-bottom:1px solid #999;}
+  .card-head{background:#1e293b;}
+  .tab-bar,.tab{display:none;}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .header-title{font-size:14px;}
+  .btn{padding:7px 10px;font-size:11px;}
+  .main{padding:12px;}
+  .card-body{padding:12px;}
+  .action-inner{justify-content:stretch;}
+  .action-inner .btn{flex:1;justify-content:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="header-eyebrow">KAMC · Critical Care</span>
+      <span class="header-title">ICU Assessment Note</span>
+    </div>
+    <div class="header-actions no-print">
+      <button class="btn btn-slate" onclick="newNote()">＋ New</button>
+      <button class="btn btn-slate" onclick="showPage('saved')">💾 Saved</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar no-print">
+  <div class="tab-inner">
+    <div class="tab active" onclick="showTab('overview')">Overview</div>
+    <div class="tab" onclick="showTab('neuro')">Neuro</div>
+    <div class="tab" onclick="showTab('cvs')">CVS</div>
+    <div class="tab" onclick="showTab('resp')">Resp</div>
+    <div class="tab" onclick="showTab('id')">ID</div>
+    <div class="tab" onclick="showTab('gi')">GI / Renal</div>
+    <div class="tab" onclick="showTab('heme')">Heme / Endo</div>
+    <div class="tab" onclick="showTab('plan')">Assessment & Plan</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- NOTE PAGE -->
+  <div id="page-note" class="page active">
+
+    <!-- PROGRESS -->
+    <div class="progress-bar no-print"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <!-- PATIENT STRIP -->
+    <div class="patient-strip">
+      <label>Patient Name<input id="f-name" placeholder="Full name" oninput="saveProgress()"/></label>
+      <div class="strip-divider"></div>
+      <label>MRN<input id="f-mrn" placeholder="MRN" style="width:90px" oninput="saveProgress()"/></label>
+      <div class="strip-divider"></div>
+      <label>Date<input id="f-date" type="date" style="width:130px" oninput="saveProgress()"/></label>
+      <div class="strip-divider"></div>
+      <label>Bed / Unit<input id="f-bed" placeholder="e.g. A-04" style="width:80px" oninput="saveProgress()"/></label>
+    </div>
+
+    <!-- ── OVERVIEW TAB ── -->
+    <div id="tab-overview" class="tab-content">
+      <div class="card">
+        <div class="card-head"><span class="card-title">I. Clinical Overview</span></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="field-group">
+              <span class="field-label">Reason for ICU Admission</span>
+              <textarea id="f-reason" class="field-input" rows="2" oninput="saveProgress()"></textarea>
+            </div>
+          </div>
+          <div class="sub-label">History of Present Illness</div>
+          <div class="row"><div class="field-group"><input id="f-hpi1" class="field-input" placeholder="• " oninput="saveProgress()"/></div></div>
+          <div class="row"><div class="field-group"><input id="f-hpi2" class="field-input" placeholder="• " oninput="saveProgress()"/></div></div>
+          <div class="row"><div class="field-group"><input id="f-hpi3" class="field-input" placeholder="• " oninput="saveProgress()"/></div></div>
+          <div class="sub-label">Background / Comorbidities</div>
+          <div class="cb-group" id="pmhx-group">
+            <label class="cb-item"><input type="checkbox" value="HTN" onchange="toggleCB(this);saveProgress()"/>HTN</label>
+            <label class="cb-item"><input type="checkbox" value="DM" onchange="toggleCB(this);saveProgress()"/>DM</label>
+            <label class="cb-item"><input type="checkbox" value="CAD/MI" onchange="toggleCB(this);saveProgress()"/>CAD/MI</label>
+            <label class="cb-item"><input type="checkbox" value="CHF" onchange="toggleCB(this);saveProgress()"/>CHF</label>
+            <label class="cb-item"><input type="checkbox" value="COPD/Asthma" onchange="toggleCB(this);saveProgress()"/>COPD/Asthma</label>
+            <label class="cb-item"><input type="checkbox" value="CKD/ESRD" onchange="toggleCB(this);saveProgress()"/>CKD/ESRD</label>
+            <label class="cb-item"><input type="checkbox" value="Stroke/TIA" onchange="toggleCB(this);saveProgress()"/>Stroke/TIA</label>
+            <label class="cb-item"><input type="checkbox" value="Liver Disease" onchange="toggleCB(this);saveProgress()"/>Liver Disease</label>
+            <label class="cb-item"><input type="checkbox" value="Malignancy" onchange="toggleCB(this);saveProgress()"/>Malignancy</label>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="field-group"><span class="field-label">Other Comorbidities</span><input id="f-pmhx-other" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NEURO TAB ── -->
+    <div id="tab-neuro" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-num">1</span><span class="card-title">Neurological</span></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="field-group" style="max-width:100px"><span class="field-label">GCS (/15)</span><input id="f-gcs" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Pupils</span><input id="f-pupils" class="field-input" placeholder="Size / Reactivity" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label">Sedation</div>
+          <div class="cb-group" id="sed-group">
+            <label class="cb-item"><input type="checkbox" value="Midazolam" onchange="toggleCB(this);saveProgress()"/>Midazolam</label>
+            <label class="cb-item"><input type="checkbox" value="Propofol" onchange="toggleCB(this);saveProgress()"/>Propofol</label>
+            <label class="cb-item"><input type="checkbox" value="Fentanyl" onchange="toggleCB(this);saveProgress()"/>Fentanyl</label>
+            <label class="cb-item"><input type="checkbox" value="Morphine" onchange="toggleCB(this);saveProgress()"/>Morphine</label>
+            <label class="cb-item"><input type="checkbox" value="Dexmedetomidine" onchange="toggleCB(this);saveProgress()"/>Dexmedetomidine</label>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="field-group" style="max-width:120px"><span class="field-label">Target RASS</span><input id="f-rass-target" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group" style="max-width:120px"><span class="field-label">Current RASS</span><input id="f-rass-current" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label">Limb Mobility</div>
+          <div class="radio-group" id="limb-group">
+            <label class="radio-item" onclick="selectRadio('limb-group',this);showCond('limb-weakness',false);saveProgress()"><input type="radio" name="limb"/>Moving all extremities</label>
+            <label class="radio-item" onclick="selectRadio('limb-group',this);showCond('limb-weakness',true);saveProgress()"><input type="radio" name="limb"/>Weakness</label>
+          </div>
+          <div class="conditional" id="limb-weakness" style="display:none">
+            <div class="field-group"><span class="field-label">Specify weakness</span><input id="f-limb-detail" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label" style="margin-top:10px">Brain Imaging</div>
+          <div class="cb-group" id="brain-group">
+            <label class="cb-item"><input type="checkbox" value="CT" onchange="toggleCB(this);saveProgress()"/>CT</label>
+            <label class="cb-item"><input type="checkbox" value="MRI" onchange="toggleCB(this);saveProgress()"/>MRI</label>
+          </div>
+          <div class="row" style="margin-top:8px"><div class="field-group"><span class="field-label">Findings</span><input id="f-brain-findings" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="row"><div class="field-group"><span class="field-label">EEG</span><input id="f-eeg" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="row"><div class="field-group"><span class="field-label">CNS Drugs</span><input id="f-cns-drugs" class="field-input" oninput="saveProgress()"/></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CVS TAB ── -->
+    <div id="tab-cvs" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-num">2</span><span class="card-title">Cardiovascular</span></div>
+        <div class="card-body">
+          <div class="sub-label">Hemodynamics</div>
+          <div class="row">
+            <div class="field-group" style="max-width:90px"><span class="field-label">HR (bpm)</span><input id="f-hr" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group" style="max-width:90px"><span class="field-label">MAP (mmHg)</span><input id="f-map" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Other (PPV / POCUS / PLR)</span><input id="f-hem-other" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label">Perfusion Labs</div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">Lactate</span><input id="f-lactate" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">BNP</span><input id="f-bnp" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Troponin</span><input id="f-troponin" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label">Vasopressors / Inotropes</div>
+          <div id="vaso-list">
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-norepi"><input type="checkbox" value="Norepinephrine" onchange="toggleCB(this);toggleVasoDose('norepi',this.checked);saveProgress()"/>Norepinephrine</label>
+              <div class="field-group conditional" id="dose-norepi" style="display:none;max-width:160px"><input id="f-dose-norepi" class="field-input" placeholder="dose (mcg/kg/min)" oninput="saveProgress()"/></div>
+            </div>
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-epi"><input type="checkbox" value="Epinephrine" onchange="toggleCB(this);toggleVasoDose('epi',this.checked);saveProgress()"/>Epinephrine</label>
+              <div class="field-group conditional" id="dose-epi" style="display:none;max-width:160px"><input id="f-dose-epi" class="field-input" placeholder="dose" oninput="saveProgress()"/></div>
+            </div>
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-vaso"><input type="checkbox" value="Vasopressin" onchange="toggleCB(this);toggleVasoDose('vaso',this.checked);saveProgress()"/>Vasopressin</label>
+              <div class="field-group conditional" id="dose-vaso" style="display:none;max-width:160px"><input id="f-dose-vaso" class="field-input" placeholder="dose (units/hr)" oninput="saveProgress()"/></div>
+            </div>
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-dopa"><input type="checkbox" value="Dopamine" onchange="toggleCB(this);toggleVasoDose('dopa',this.checked);saveProgress()"/>Dopamine</label>
+              <div class="field-group conditional" id="dose-dopa" style="display:none;max-width:160px"><input id="f-dose-dopa" class="field-input" placeholder="dose" oninput="saveProgress()"/></div>
+            </div>
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-phenyl"><input type="checkbox" value="Phenylephrine" onchange="toggleCB(this);toggleVasoDose('phenyl',this.checked);saveProgress()"/>Phenylephrine</label>
+              <div class="field-group conditional" id="dose-phenyl" style="display:none;max-width:160px"><input id="f-dose-phenyl" class="field-input" placeholder="dose" oninput="saveProgress()"/></div>
+            </div>
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-milrinone"><input type="checkbox" value="Milrinone" onchange="toggleCB(this);toggleVasoDose('milrinone',this.checked);saveProgress()"/>Milrinone</label>
+              <div class="field-group conditional" id="dose-milrinone" style="display:none;max-width:160px"><input id="f-dose-milrinone" class="field-input" placeholder="dose" oninput="saveProgress()"/></div>
+            </div>
+            <div class="vaso-row row" style="align-items:center;margin-bottom:6px">
+              <label class="cb-item" id="cb-dobu"><input type="checkbox" value="Dobutamine" onchange="toggleCB(this);toggleVasoDose('dobu',this.checked);saveProgress()"/>Dobutamine</label>
+              <div class="field-group conditional" id="dose-dobu" style="display:none;max-width:160px"><input id="f-dose-dobu" class="field-input" placeholder="dose" oninput="saveProgress()"/></div>
+            </div>
+          </div>
+          <div class="row"><div class="field-group"><span class="field-label">ECG Findings</span><input id="f-ecg" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="row"><div class="field-group"><span class="field-label">ECHO Findings</span><input id="f-echo" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="row"><div class="field-group"><span class="field-label">Cardiac Drugs</span><input id="f-cardiac-drugs" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="sub-label">VA ECMO</div>
+          <div class="cb-group">
+            <label class="cb-item" id="cb-va-ecmo"><input type="checkbox" onchange="toggleCB(this);showCond('va-ecmo-params',this.checked);saveProgress()"/>VA ECMO Active</label>
+          </div>
+          <div class="conditional" id="va-ecmo-params" style="display:none">
+            <div class="row">
+              <div class="field-group"><span class="field-label">Flow (L/min)</span><input id="f-va-flow" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">FiO2</span><input id="f-va-fio2" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">Sweep Gas</span><input id="f-va-sweep" class="field-input" oninput="saveProgress()"/></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px"><div class="field-group"><span class="field-label">Other</span><input id="f-cvs-other" class="field-input" oninput="saveProgress()"/></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESP TAB ── -->
+    <div id="tab-resp" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-num">3</span><span class="card-title">Respiratory</span></div>
+        <div class="card-body">
+          <div class="row"><div class="field-group"><span class="field-label">Chest Examination</span><input id="f-chest-exam" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="sub-label">Airway & Support</div>
+          <div class="radio-group" id="airway-group">
+            <label class="radio-item" onclick="selectRadio('airway-group',this);setAirway('room');saveProgress()"><input type="radio" name="airway"/>Room Air</label>
+            <label class="radio-item" onclick="selectRadio('airway-group',this);setAirway('o2');saveProgress()"><input type="radio" name="airway"/>NC / Mask</label>
+            <label class="radio-item" onclick="selectRadio('airway-group',this);setAirway('hfnc');saveProgress()"><input type="radio" name="airway"/>HFNC</label>
+            <label class="radio-item" onclick="selectRadio('airway-group',this);setAirway('niv');saveProgress()"><input type="radio" name="airway"/>NIV</label>
+            <label class="radio-item" onclick="selectRadio('airway-group',this);setAirway('intubated');saveProgress()"><input type="radio" name="airway"/>Intubated</label>
+          </div>
+          <div class="conditional" id="cond-o2" style="display:none">
+            <div class="row"><div class="field-group" style="max-width:120px"><span class="field-label">Flow (L/min)</span><input id="f-o2-rate" class="field-input" oninput="saveProgress()"/></div></div>
+          </div>
+          <div class="conditional" id="cond-hfnc" style="display:none">
+            <div class="row">
+              <div class="field-group"><span class="field-label">FiO2 (%)</span><input id="f-hfnc-fio2" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">Flow (L/min)</span><input id="f-hfnc-flow" class="field-input" oninput="saveProgress()"/></div>
+            </div>
+          </div>
+          <div class="conditional" id="cond-niv" style="display:none">
+            <div class="radio-group" id="niv-mode-group" style="margin-bottom:8px">
+              <label class="radio-item" onclick="selectRadio('niv-mode-group',this);saveProgress()"><input type="radio" name="nivmode"/>CPAP</label>
+              <label class="radio-item" onclick="selectRadio('niv-mode-group',this);saveProgress()"><input type="radio" name="nivmode"/>BiPAP</label>
+            </div>
+            <div class="row">
+              <div class="field-group"><span class="field-label">PSV (cmH₂O)</span><input id="f-niv-psv" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">PEEP (cmH₂O)</span><input id="f-niv-peep" class="field-input" oninput="saveProgress()"/></div>
+            </div>
+          </div>
+          <div class="conditional" id="cond-intubated" style="display:none">
+            <div class="row">
+              <div class="field-group"><span class="field-label">ETT Size / Mark at lip</span><input id="f-ett" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group" style="max-width:160px;justify-content:flex-end;padding-top:18px">
+                <label class="cb-item"><input type="checkbox" value="Tracheostomy" onchange="toggleCB(this);saveProgress()"/>Tracheostomy</label>
+              </div>
+            </div>
+          </div>
+          <!-- MV params always shown if intubated or NIV -->
+          <div id="cond-mv" style="display:none">
+            <div class="sub-label">Mechanical Ventilation</div>
+            <div class="row">
+              <div class="field-group" style="max-width:80px"><span class="field-label">Day #</span><input id="f-mv-day" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">Mode</span><input id="f-mv-mode" class="field-input" placeholder="e.g. PC-AC, VC-AC, PSV" oninput="saveProgress()"/></div>
+            </div>
+            <div class="row">
+              <div class="field-group"><span class="field-label">Vt (mL)</span><input id="f-mv-vt" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">RR (/min)</span><input id="f-mv-rr" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">PEEP</span><input id="f-mv-peep" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">FiO2 (%)</span><input id="f-mv-fio2" class="field-input" oninput="saveProgress()"/></div>
+            </div>
+          </div>
+          <div class="sub-label">ABG</div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">pH</span><input id="f-ph" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">pCO2</span><input id="f-pco2" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">pO2</span><input id="f-po2" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">HCO3</span><input id="f-hco3" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">P/F Ratio</span><input id="f-pf" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">ROX Index (HFNC)</span><input id="f-rox" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">HACOR (NIV)</span><input id="f-hacor" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row"><div class="field-group"><span class="field-label">CXR Findings</span><input id="f-cxr" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="sub-label">Respiratory Meds</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="Bronchodilators" onchange="toggleCB(this);saveProgress()"/>Bronchodilators</label>
+            <label class="cb-item"><input type="checkbox" value="iNO" onchange="toggleCB(this);saveProgress()"/>Inhaled NO (iNO)</label>
+            <label class="cb-item"><input type="checkbox" value="Neuromuscular blockade" onchange="toggleCB(this);saveProgress()"/>NMB</label>
+            <label class="cb-item" id="cb-resp-other"><input type="checkbox" onchange="toggleCB(this);showCond('resp-other-cond',this.checked);saveProgress()"/>Other</label>
+          </div>
+          <div class="conditional" id="resp-other-cond" style="display:none">
+            <div class="field-group"><input id="f-resp-other" class="field-input" placeholder="Specify" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label" style="margin-top:10px">VV ECMO</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" onchange="toggleCB(this);showCond('vv-ecmo-params',this.checked);saveProgress()"/>VV ECMO Active</label>
+          </div>
+          <div class="conditional" id="vv-ecmo-params" style="display:none">
+            <div class="row">
+              <div class="field-group"><span class="field-label">Flow (L/min)</span><input id="f-vv-flow" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">FiO2</span><input id="f-vv-fio2" class="field-input" oninput="saveProgress()"/></div>
+              <div class="field-group"><span class="field-label">Sweep Gas</span><input id="f-vv-sweep" class="field-input" oninput="saveProgress()"/></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px"><div class="field-group"><span class="field-label">Other (chest tube / drain)</span><input id="f-resp-other2" class="field-input" oninput="saveProgress()"/></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ID TAB ── -->
+    <div id="tab-id" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-num">4</span><span class="card-title">Infectious Disease</span></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="field-group"><span class="field-label">Max Temp last 24h (°C)</span><input id="f-temp" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">WBC (×10⁹/L)</span><input id="f-wbc" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">Procalcitonin</span><input id="f-pct" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">CRP</span><input id="f-crp" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row"><div class="field-group"><span class="field-label">Cultures — (+) Positive Results</span><textarea id="f-cultures" class="field-input" rows="2" oninput="saveProgress()"></textarea></div></div>
+          <div class="sub-label">MDRO</div>
+          <div class="radio-group" id="mdro-group">
+            <label class="radio-item" onclick="selectRadio('mdro-group',this);showCond('mdro-spec',false);saveProgress()"><input type="radio" name="mdro"/>No</label>
+            <label class="radio-item" onclick="selectRadio('mdro-group',this);showCond('mdro-spec',true);saveProgress()"><input type="radio" name="mdro"/>Yes</label>
+          </div>
+          <div class="conditional" id="mdro-spec" style="display:none">
+            <div class="field-group"><span class="field-label">Specify MDRO</span><input id="f-mdro-spec" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row" style="margin-top:8px"><div class="field-group"><span class="field-label">Antimicrobials</span><textarea id="f-abx" class="field-input" rows="2" placeholder="Drug — dose — route — day #" oninput="saveProgress()"></textarea></div></div>
+          <div class="row"><div class="field-group"><span class="field-label">Drug Levels (e.g. Vancomycin AUC, Trough)</span><input id="f-drug-levels" class="field-input" oninput="saveProgress()"/></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GI / RENAL TAB ── -->
+    <div id="tab-gi" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-num">5</span><span class="card-title">Gastrointestinal & Nutrition</span></div>
+        <div class="card-body">
+          <div class="sub-label">Feeding Status</div>
+          <div class="radio-group" id="feeding-group">
+            <label class="radio-item" onclick="selectRadio('feeding-group',this);setFeeding('npo');saveProgress()"><input type="radio" name="feeding"/>NPO</label>
+            <label class="radio-item" onclick="selectRadio('feeding-group',this);setFeeding('enteral');saveProgress()"><input type="radio" name="feeding"/>Enteral</label>
+            <label class="radio-item" onclick="selectRadio('feeding-group',this);setFeeding('tpn');saveProgress()"><input type="radio" name="feeding"/>TPN</label>
+          </div>
+          <div class="conditional" id="feed-npo" style="display:none"><div class="field-group"><span class="field-label">Reason for NPO</span><input id="f-npo-reason" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="conditional" id="feed-enteral" style="display:none"><div class="field-group"><span class="field-label">Formula / Rate</span><input id="f-enteral" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="conditional" id="feed-tpn" style="display:none"><div class="field-group"><span class="field-label">Calories / 24hrs</span><input id="f-tpn-cal" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="sub-label" style="margin-top:10px">Bowel Motion (last 24h)</div>
+          <div class="radio-group" id="bowel-group">
+            <label class="radio-item" onclick="selectRadio('bowel-group',this);saveProgress()"><input type="radio" name="bowel"/>Yes</label>
+            <label class="radio-item" onclick="selectRadio('bowel-group',this);saveProgress()"><input type="radio" name="bowel"/>No</label>
+          </div>
+          <div class="sub-label" style="margin-top:10px">Abdominal Exam</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="Soft/Non-Tender" onchange="toggleCB(this);saveProgress()"/>Soft/Non-Tender</label>
+            <label class="cb-item"><input type="checkbox" value="Distended" onchange="toggleCB(this);saveProgress()"/>Distended</label>
+            <label class="cb-item"><input type="checkbox" value="Tender" onchange="toggleCB(this);saveProgress()"/>Tender</label>
+            <label class="cb-item"><input type="checkbox" value="Rigidity/Guarding" onchange="toggleCB(this);saveProgress()"/>Rigidity/Guarding</label>
+          </div>
+          <div class="sub-label" style="margin-top:10px">GI Labs</div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">AST</span><input id="f-ast" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">ALT</span><input id="f-alt" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">T.Bil</span><input id="f-tbil" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">D.Bil</span><input id="f-dbil" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Albumin</span><input id="f-albumin" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">Amylase</span><input id="f-amylase" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Lipase</span><input id="f-lipase" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row"><div class="field-group"><span class="field-label">Abdominal Imaging</span><input id="f-abd-imaging" class="field-input" oninput="saveProgress()"/></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-num">6</span><span class="card-title">Renal</span></div>
+        <div class="card-body">
+          <div class="sub-label">Fluid Status</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="Edema" onchange="toggleCB(this);saveProgress()"/>Edema</label>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div class="field-group"><span class="field-label">UOP (mL/hr)</span><input id="f-uop" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Fluid In (mL/24h)</span><input id="f-fluid-in" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Fluid Out (mL/24h)</span><input id="f-fluid-out" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label">Renal Panel</div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">Cr (μmol/L)</span><input id="f-cr" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">BUN</span><input id="f-bun" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Na (mmol/L)</span><input id="f-na" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">K (mmol/L)</span><input id="f-k" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="row"><div class="field-group"><span class="field-label">Diuretics</span><input id="f-diuretics" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="row">
+            <div class="field-group"><span class="field-label">CRRT / HD Mode</span><input id="f-crrt-mode" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">UF Rate</span><input id="f-uf" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HEME / ENDO TAB ── -->
+    <div id="tab-heme" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-num">7</span><span class="card-title">Hematology</span></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="field-group"><span class="field-label">Hb (g/dL)</span><input id="f-hb" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">Plt (×10⁹/L)</span><input id="f-plt" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">INR</span><input id="f-inr" class="field-input" oninput="saveProgress()"/></div>
+            <div class="field-group"><span class="field-label">PTT (sec)</span><input id="f-ptt" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="sub-label">Bleeding Tendency</div>
+          <div class="radio-group" id="bleed-group">
+            <label class="radio-item" onclick="selectRadio('bleed-group',this);saveProgress()"><input type="radio" name="bleed"/>None</label>
+            <label class="radio-item" onclick="selectRadio('bleed-group',this);saveProgress()"><input type="radio" name="bleed"/>Active Bleeding</label>
+            <label class="radio-item" onclick="selectRadio('bleed-group',this);saveProgress()"><input type="radio" name="bleed"/>High Risk</label>
+          </div>
+          <div class="sub-label" style="margin-top:10px">Anticoagulation</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="Heparin IV" onchange="toggleCB(this);saveProgress()"/>Heparin IV</label>
+            <label class="cb-item"><input type="checkbox" value="LMWH" onchange="toggleCB(this);saveProgress()"/>LMWH</label>
+            <label class="cb-item"><input type="checkbox" value="DOAC" onchange="toggleCB(this);saveProgress()"/>DOAC</label>
+            <label class="cb-item"><input type="checkbox" value="Warfarin" onchange="toggleCB(this);saveProgress()"/>Warfarin</label>
+          </div>
+          <div class="row" style="margin-top:8px"><div class="field-group"><span class="field-label">Dose</span><input id="f-anticoag-dose" class="field-input" oninput="saveProgress()"/></div></div>
+          <div class="sub-label">Antiplatelet</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="Aspirin" onchange="toggleCB(this);saveProgress()"/>Aspirin</label>
+            <label class="cb-item"><input type="checkbox" value="Clopidogrel" onchange="toggleCB(this);saveProgress()"/>Clopidogrel</label>
+            <label class="cb-item" id="cb-antiplat-other"><input type="checkbox" onchange="toggleCB(this);showCond('antiplat-other',this.checked);saveProgress()"/>Other</label>
+          </div>
+          <div class="conditional" id="antiplat-other" style="display:none">
+            <div class="field-group"><input id="f-antiplat-other" class="field-input" placeholder="Specify" oninput="saveProgress()"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-num">8</span><span class="card-title">Endocrine</span></div>
+        <div class="card-body">
+          <div class="row"><div class="field-group" style="max-width:200px"><span class="field-label">Blood Glucose</span><input id="f-glucose" class="field-input" placeholder="mmol/L or mg/dL" oninput="saveProgress()"/></div></div>
+          <div class="cb-group" style="margin-top:4px">
+            <label class="cb-item" id="cb-insulin"><input type="checkbox" onchange="toggleCB(this);showCond('insulin-detail',this.checked);saveProgress()"/>Insulin</label>
+          </div>
+          <div class="conditional" id="insulin-detail" style="display:none">
+            <div class="field-group"><span class="field-label">Regimen / Drip</span><input id="f-insulin-reg" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="cb-group" style="margin-top:8px">
+            <label class="cb-item" id="cb-steroids"><input type="checkbox" onchange="toggleCB(this);showCond('steroid-detail',this.checked);saveProgress()"/>Steroids</label>
+          </div>
+          <div class="conditional" id="steroid-detail" style="display:none">
+            <div class="field-group"><span class="field-label">Dose</span><input id="f-steroid-dose" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+          <div class="cb-group" style="margin-top:8px">
+            <label class="cb-item" id="cb-thyroid"><input type="checkbox" onchange="toggleCB(this);showCond('thyroid-detail',this.checked);saveProgress()"/>L-Thyroxine</label>
+          </div>
+          <div class="conditional" id="thyroid-detail" style="display:none">
+            <div class="field-group"><span class="field-label">Dose</span><input id="f-thyroid-dose" class="field-input" oninput="saveProgress()"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-num">9</span><span class="card-title">Extremities & Perfusion</span></div>
+        <div class="card-body">
+          <div class="sub-label">Peripheral Pulses</div>
+          <div class="radio-group" id="pulses-group">
+            <label class="radio-item" onclick="selectRadio('pulses-group',this);saveProgress()"><input type="radio" name="pulses"/>Palpable</label>
+            <label class="radio-item" onclick="selectRadio('pulses-group',this);saveProgress()"><input type="radio" name="pulses"/>Diminished</label>
+            <label class="radio-item" onclick="selectRadio('pulses-group',this);saveProgress()"><input type="radio" name="pulses"/>Absent (Doppler)</label>
+          </div>
+          <div class="sub-label" style="margin-top:10px">Capillary Refill</div>
+          <div class="radio-group" id="cap-group">
+            <label class="radio-item" onclick="selectRadio('cap-group',this);saveProgress()"><input type="radio" name="cap"/>< 2 seconds</label>
+            <label class="radio-item" onclick="selectRadio('cap-group',this);saveProgress()"><input type="radio" name="cap"/>> 2 seconds</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-num">10</span><span class="card-title">Prophylaxis</span></div>
+        <div class="card-body">
+          <div class="sub-label">DVT</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="LMWH" onchange="toggleCB(this);saveProgress()"/>LMWH</label>
+            <label class="cb-item"><input type="checkbox" value="Heparin SC" onchange="toggleCB(this);saveProgress()"/>Heparin SC</label>
+            <label class="cb-item"><input type="checkbox" value="SCDs/Mechanical" onchange="toggleCB(this);saveProgress()"/>SCDs/Mechanical</label>
+            <label class="cb-item"><input type="checkbox" value="None (Contraindicated)" onchange="toggleCB(this);saveProgress()"/>None (Contraindicated)</label>
+          </div>
+          <div class="sub-label" style="margin-top:10px">PUD</div>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox" value="PPI" onchange="toggleCB(this);saveProgress()"/>PPI</label>
+            <label class="cb-item"><input type="checkbox" value="H2 Blocker" onchange="toggleCB(this);saveProgress()"/>H2 Blocker</label>
+            <label class="cb-item"><input type="checkbox" value="Enteral Feeding" onchange="toggleCB(this);saveProgress()"/>Enteral Feeding</label>
+            <label class="cb-item"><input type="checkbox" value="None" onchange="toggleCB(this);saveProgress()"/>None</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLAN TAB ── -->
+    <div id="tab-plan" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-head"><span class="card-title">V. Assessment & Plan</span></div>
+        <div class="card-body">
+          <div class="sub-label">Problem List</div>
+          <div id="problem-list">
+            <div class="problem-row"><span class="problem-num">1</span><input class="field-input" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/></div>
+            <div class="problem-row"><span class="problem-num">2</span><input class="field-input" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/></div>
+            <div class="problem-row"><span class="problem-num">3</span><input class="field-input" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/></div>
+            <div class="problem-row"><span class="problem-num">4</span><input class="field-input" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/></div>
+          </div>
+          <button class="btn btn-outline no-print" style="margin-top:8px;font-size:12px" onclick="addProblem()">+ Add Problem</button>
+
+          <div class="sub-label" style="margin-top:16px">Daily Plan</div>
+          <div class="plan-row"><span class="plan-tag">Neuro</span><input id="f-plan-neuro" class="field-input" oninput="saveProgress()"/></div>
+          <div class="plan-row"><span class="plan-tag">CVS</span><input id="f-plan-cvs" class="field-input" oninput="saveProgress()"/></div>
+          <div class="plan-row"><span class="plan-tag">Resp</span><input id="f-plan-resp" class="field-input" oninput="saveProgress()"/></div>
+          <div class="plan-row"><span class="plan-tag">ID</span><input id="f-plan-id" class="field-input" oninput="saveProgress()"/></div>
+          <div class="plan-row"><span class="plan-tag">GI/Renal</span><input id="f-plan-gi" class="field-input" oninput="saveProgress()"/></div>
+          <div class="plan-row"><span class="plan-tag">Other</span><input id="f-plan-other" class="field-input" oninput="saveProgress()"/></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end page-note -->
+
+  <!-- SAVED NOTES PAGE -->
+  <div id="page-saved" class="page" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="font-size:15px;font-weight:800;color:var(--navy)">Saved Notes</span>
+      <button class="btn btn-slate" onclick="showPage('note')">← Back</button>
+    </div>
+    <div id="saved-list"></div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- ACTION BAR -->
+<div class="action-bar no-print" id="action-bar">
+  <div class="action-inner">
+    <button class="btn btn-slate" onclick="saveNote()">💾 Save</button>
+    <button class="btn btn-cyan" onclick="showHISModal()">📋 Copy to HIS</button>
+    <button class="btn btn-slate" onclick="window.print()">🖨 Print / PDF</button>
+    <button class="btn btn-danger" onclick="confirmReset()">🗑 Reset</button>
+  </div>
+</div>
+
+<!-- HIS MODAL -->
+<div id="his-modal">
+  <div class="modal-box">
+    <div class="modal-title">📋 HIS-Ready Note — Copy & Paste</div>
+    <pre id="his-text"></pre>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" onclick="copyHIS()">Copy All</button>
+      <button class="btn btn-slate" onclick="closeHIS()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ────────────────────────────────────────────────
+// HELPERS
+// ────────────────────────────────────────────────
+function v(id){ const el=document.getElementById(id); return el ? el.value.trim() : ''; }
+function checked(id){ const el=document.getElementById(id); return el ? el.checked : false; }
+function showCond(id,show){ const el=document.getElementById(id); if(el) el.style.display=show?'':'none'; }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+function toggleCB(input){
+  const label = input.closest('.cb-item');
+  if(label) label.classList.toggle('checked', input.checked);
+}
+function selectRadio(groupId, label){
+  document.querySelectorAll('#'+groupId+' .radio-item').forEach(l=>l.classList.remove('selected'));
+  label.classList.add('selected');
+}
+function getRadio(groupId){
+  const sel = document.querySelector('#'+groupId+' .radio-item.selected');
+  return sel ? sel.textContent.trim() : '';
+}
+function getChecked(groupId){
+  return [...document.querySelectorAll('#'+groupId+' .cb-item.checked')].map(l=>l.textContent.trim()).filter(Boolean);
+}
+
+// ────────────────────────────────────────────────
+// TABS
+// ────────────────────────────────────────────────
+function showTab(name){
+  document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  const content = document.getElementById('tab-'+name);
+  if(content) content.style.display='block';
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t=>{ if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+name+"'")) t.classList.add('active'); });
+}
+
+// ────────────────────────────────────────────────
+// PAGES
+// ────────────────────────────────────────────────
+function showPage(name){
+  document.getElementById('page-note').style.display = name==='note'?'block':'none';
+  document.getElementById('page-saved').style.display = name==='saved'?'block':'none';
+  document.getElementById('action-bar').style.display = name==='note'?'':'none';
+  if(name==='saved') renderSaved();
+}
+
+// ────────────────────────────────────────────────
+// AIRWAY / FEEDING CONDITIONALS
+// ────────────────────────────────────────────────
+function setAirway(type){
+  ['cond-o2','cond-hfnc','cond-niv','cond-intubated','cond-mv'].forEach(id=>showCond(id,false));
+  if(type==='o2') showCond('cond-o2',true);
+  if(type==='hfnc') showCond('cond-hfnc',true);
+  if(type==='niv'){ showCond('cond-niv',true); showCond('cond-mv',true); }
+  if(type==='intubated'){ showCond('cond-intubated',true); showCond('cond-mv',true); }
+}
+function setFeeding(type){
+  ['feed-npo','feed-enteral','feed-tpn'].forEach(id=>showCond(id,false));
+  showCond('feed-'+type,true);
+}
+function toggleVasoDose(name,show){
+  showCond('dose-'+name,show);
+}
+
+// ────────────────────────────────────────────────
+// PROBLEM LIST
+// ────────────────────────────────────────────────
+function addProblem(){
+  const list = document.getElementById('problem-list');
+  const n = list.children.length+1;
+  const row = document.createElement('div');
+  row.className='problem-row';
+  row.innerHTML=`<span class="problem-num">${n}</span><input class="field-input" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/>`;
+  list.appendChild(row);
+}
+function getProblems(){
+  return [...document.querySelectorAll('#problem-list input')].map((el,i)=>el.value.trim()?`${i+1}. ${el.value.trim()}`:'').filter(Boolean).join('\n');
+}
+
+// ────────────────────────────────────────────────
+// PROGRESS BAR
+// ────────────────────────────────────────────────
+function saveProgress(){
+  const fields = document.querySelectorAll('#page-note input[type=text], #page-note input[type=date], #page-note textarea, #page-note input:not([type])');
+  const total = fields.length;
+  const filled = [...fields].filter(f=>f.value.trim()!=='').length;
+  const pct = total>0 ? Math.round((filled/total)*100) : 0;
+  const bar = document.getElementById('progress-fill');
+  if(bar) bar.style.width=pct+'%';
+}
+
+// ────────────────────────────────────────────────
+// COLLECT ALL DATA
+// ────────────────────────────────────────────────
+function collectData(){
+  const problems = [...document.querySelectorAll('#problem-list input')].map(el=>el.value.trim()).filter(Boolean);
+  return {
+    meta:{ name:v('f-name'), mrn:v('f-mrn'), date:v('f-date'), bed:v('f-bed') },
+    overview:{ reason:v('f-reason'), hpi:[v('f-hpi1'),v('f-hpi2'),v('f-hpi3')].filter(Boolean), pmhx: getChecked('pmhx-group'), pmhxOther: v('f-pmhx-other') },
+    neuro:{ gcs:v('f-gcs'), pupils:v('f-pupils'), sedation:getChecked('sed-group'), rassTarget:v('f-rass-target'), rassCurrent:v('f-rass-current'), limb:getRadio('limb-group'), limbDetail:v('f-limb-detail'), imaging:getChecked('brain-group'), brainFindings:v('f-brain-findings'), eeg:v('f-eeg'), cnsDrugs:v('f-cns-drugs') },
+    cvs:{ hr:v('f-hr'), map:v('f-map'), hemOther:v('f-hem-other'), lactate:v('f-lactate'), bnp:v('f-bnp'), troponin:v('f-troponin'),
+      vasopressors: ['norepi','epi','vaso','dopa','phenyl','milrinone','dobu'].filter(n=>document.querySelector(`#cb-${n} input`)?.checked).map(n=>({name:document.querySelector(`#cb-${n} input`).value, dose:v(`f-dose-${n}`)})),
+      ecg:v('f-ecg'), echo:v('f-echo'), cardiacDrugs:v('f-cardiac-drugs'),
+      vaEcmo:document.querySelector('#cb-va-ecmo input')?.checked, vaFlow:v('f-va-flow'), vaFio2:v('f-va-fio2'), vaSweep:v('f-va-sweep'), cvsOther:v('f-cvs-other') },
+    resp:{ chestExam:v('f-chest-exam'), airway:getRadio('airway-group'), o2Rate:v('f-o2-rate'), hfncFio2:v('f-hfnc-fio2'), hfncFlow:v('f-hfnc-flow'),
+      nivMode:getRadio('niv-mode-group'), nivPSV:v('f-niv-psv'), nivPEEP:v('f-niv-peep'),
+      ett:v('f-ett'), mvDay:v('f-mv-day'), mvMode:v('f-mv-mode'), mvVt:v('f-mv-vt'), mvRR:v('f-mv-rr'), mvPEEP:v('f-mv-peep'), mvFio2:v('f-mv-fio2'),
+      ph:v('f-ph'), pco2:v('f-pco2'), po2:v('f-po2'), hco3:v('f-hco3'), pf:v('f-pf'), rox:v('f-rox'), hacor:v('f-hacor'),
+      cxr:v('f-cxr'), respMeds:getChecked(''), respOther:v('f-resp-other2'),
+      vvEcmo:document.querySelector('#vv-ecmo-params')?.style.display!=='none', vvFlow:v('f-vv-flow'), vvFio2:v('f-vv-fio2'), vvSweep:v('f-vv-sweep') },
+    id:{ temp:v('f-temp'), wbc:v('f-wbc'), pct:v('f-pct'), crp:v('f-crp'), cultures:v('f-cultures'), mdro:getRadio('mdro-group'), mdroSpec:v('f-mdro-spec'), abx:v('f-abx'), drugLevels:v('f-drug-levels') },
+    gi:{ feeding:getRadio('feeding-group'), npoReason:v('f-npo-reason'), enteral:v('f-enteral'), tpnCal:v('f-tpn-cal'),
+      bowel:getRadio('bowel-group'), abdExam:getChecked(''), ast:v('f-ast'), alt:v('f-alt'), tbil:v('f-tbil'), dbil:v('f-dbil'), albumin:v('f-albumin'),
+      amylase:v('f-amylase'), lipase:v('f-lipase'), abdImaging:v('f-abd-imaging') },
+    renal:{ edema:getChecked(''), uop:v('f-uop'), fluidIn:v('f-fluid-in'), fluidOut:v('f-fluid-out'), cr:v('f-cr'), bun:v('f-bun'), na:v('f-na'), k:v('f-k'), diuretics:v('f-diuretics'), crrtMode:v('f-crrt-mode'), uf:v('f-uf') },
+    heme:{ hb:v('f-hb'), plt:v('f-plt'), inr:v('f-inr'), ptt:v('f-ptt'), bleeding:getRadio('bleed-group'), anticoag:getChecked(''), anticoagDose:v('f-anticoag-dose'), antiplatelet:getChecked(''), antiplateletOther:v('f-antiplat-other') },
+    endo:{ glucose:v('f-glucose'), insulinReg:v('f-insulin-reg'), steroidDose:v('f-steroid-dose'), thyroidDose:v('f-thyroid-dose') },
+    ext:{ pulses:getRadio('pulses-group'), capRefill:getRadio('cap-group') },
+    proph:{ dvt:getChecked(''), pud:getChecked('') },
+    plan:{ problems, neuro:v('f-plan-neuro'), cvs:v('f-plan-cvs'), resp:v('f-plan-resp'), id:v('f-plan-id'), gi:v('f-plan-gi'), other:v('f-plan-other') }
+  };
+}
+
+// ────────────────────────────────────────────────
+// GENERATE HIS TEXT
+// ────────────────────────────────────────────────
+function generateHIS(d){
+  const line = (label,val)=>val?`  ${label}: ${val}\n`:'';
+  const section = (title)=>`\n${'═'.repeat(50)}\n${title}\n${'═'.repeat(50)}\n`;
+  let t='';
+  t+=`CRITICAL CARE ASSESSMENT NOTE — KAMC\n`;
+  t+=`${'─'.repeat(50)}\n`;
+  t+=`Patient : ${d.meta.name||'___'}\n`;
+  t+=`MRN     : ${d.meta.mrn||'___'}     Date: ${d.meta.date||'___'}     Bed: ${d.meta.bed||'___'}\n`;
+
+  t+=section('I. CLINICAL OVERVIEW');
+  if(d.overview.reason) t+=`Reason for Admission:\n  ${d.overview.reason}\n`;
+  if(d.overview.hpi.length){ t+=`HPI:\n`; d.overview.hpi.forEach(h=>t+=`  • ${h}\n`); }
+  if(d.overview.pmhx.length||d.overview.pmhxOther) t+=`PMHx: ${[...d.overview.pmhx, d.overview.pmhxOther].filter(Boolean).join(', ')}\n`;
+
+  t+=section('II. SYSTEMIC REVIEW');
+
+  t+=`\n[1. NEUROLOGICAL]\n`;
+  if(d.neuro.gcs) t+=`  GCS: ${d.neuro.gcs}/15`;
+  if(d.neuro.pupils) t+=`   Pupils: ${d.neuro.pupils}`;
+  if(d.neuro.gcs||d.neuro.pupils) t+='\n';
+  if(d.neuro.sedation.length) t+=`  Sedation: ${d.neuro.sedation.join(', ')}\n`;
+  if(d.neuro.rassTarget||d.neuro.rassCurrent) t+=`  RASS — Target: ${d.neuro.rassTarget||'—'}  Current: ${d.neuro.rassCurrent||'—'}\n`;
+  if(d.neuro.limb) t+=`  Limb Mobility: ${d.neuro.limb}${d.neuro.limbDetail?' — '+d.neuro.limbDetail:''}\n`;
+  if(d.neuro.imaging.length) t+=`  Brain Imaging: ${d.neuro.imaging.join(', ')}${d.neuro.brainFindings?' — '+d.neuro.brainFindings:''}\n`;
+  if(d.neuro.eeg) t+=`  EEG: ${d.neuro.eeg}\n`;
+  if(d.neuro.cnsDrugs) t+=`  CNS Drugs: ${d.neuro.cnsDrugs}\n`;
+
+  t+=`\n[2. CARDIOVASCULAR]\n`;
+  if(d.cvs.hr||d.cvs.map) t+=`  HR: ${d.cvs.hr||'—'} bpm   MAP: ${d.cvs.map||'—'} mmHg${d.cvs.hemOther?' | '+d.cvs.hemOther:''}\n`;
+  if(d.cvs.lactate||d.cvs.bnp||d.cvs.troponin) t+=`  Lactate: ${d.cvs.lactate||'—'}  BNP: ${d.cvs.bnp||'—'}  Troponin: ${d.cvs.troponin||'—'}\n`;
+  if(d.cvs.vasopressors.length){ t+=`  Vasopressors:\n`; d.cvs.vasopressors.forEach(vp=>t+=`    • ${vp.name}${vp.dose?' — '+vp.dose:''}\n`); }
+  if(d.cvs.ecg) t+=`  ECG: ${d.cvs.ecg}\n`;
+  if(d.cvs.echo) t+=`  ECHO: ${d.cvs.echo}\n`;
+  if(d.cvs.cardiacDrugs) t+=`  Cardiac Drugs: ${d.cvs.cardiacDrugs}\n`;
+  if(d.cvs.vaEcmo) t+=`  VA ECMO: Flow ${d.cvs.vaFlow} | FiO2 ${d.cvs.vaFio2} | Sweep ${d.cvs.vaSweep}\n`;
+  if(d.cvs.cvsOther) t+=`  Other: ${d.cvs.cvsOther}\n`;
+
+  t+=`\n[3. RESPIRATORY]\n`;
+  if(d.resp.chestExam) t+=`  Chest Exam: ${d.resp.chestExam}\n`;
+  if(d.resp.airway){
+    let aw=`  Airway: ${d.resp.airway}`;
+    if(d.resp.airway==='NC / Mask'&&d.resp.o2Rate) aw+=` @ ${d.resp.o2Rate} L/min`;
+    if(d.resp.airway==='HFNC') aw+=` (FiO2 ${d.resp.hfncFio2}% | Flow ${d.resp.hfncFlow} L/min)`;
+    if(d.resp.airway==='NIV') aw+=` — ${d.resp.nivMode} | PSV ${d.resp.nivPSV} | PEEP ${d.resp.nivPEEP}`;
+    if(d.resp.airway==='Intubated') aw+=` (ETT ${d.resp.ett})`;
+    t+=aw+'\n';
+  }
+  if(d.resp.mvDay||d.resp.mvMode) t+=`  MV Day #${d.resp.mvDay}: ${d.resp.mvMode} | Vt ${d.resp.mvVt} mL | RR ${d.resp.mvRR} | PEEP ${d.resp.mvPEEP} | FiO2 ${d.resp.mvFio2}%\n`;
+  if(d.resp.ph) t+=`  ABG: pH ${d.resp.ph} / pCO2 ${d.resp.pco2} / pO2 ${d.resp.po2} / HCO3 ${d.resp.hco3}\n`;
+  if(d.resp.pf||d.resp.rox||d.resp.hacor) t+=`       P/F ${d.resp.pf||'—'} | ROX ${d.resp.rox||'—'} | HACOR ${d.resp.hacor||'—'}\n`;
+  if(d.resp.cxr) t+=`  CXR: ${d.resp.cxr}\n`;
+  if(d.resp.vvEcmo) t+=`  VV ECMO: Flow ${d.resp.vvFlow} | FiO2 ${d.resp.vvFio2} | Sweep ${d.resp.vvSweep}\n`;
+  if(d.resp.respOther) t+=`  Other: ${d.resp.respOther}\n`;
+
+  t+=`\n[4. INFECTIOUS DISEASE]\n`;
+  if(d.id.temp||d.id.wbc) t+=`  Max Temp: ${d.id.temp||'—'} °C   WBC: ${d.id.wbc||'—'}\n`;
+  if(d.id.pct||d.id.crp) t+=`  PCT: ${d.id.pct||'—'}   CRP: ${d.id.crp||'—'}\n`;
+  if(d.id.cultures) t+=`  Cultures (+): ${d.id.cultures}\n`;
+  if(d.id.mdro) t+=`  MDRO: ${d.id.mdro}${d.id.mdroSpec?' — '+d.id.mdroSpec:''}\n`;
+  if(d.id.abx) t+=`  Antimicrobials:\n${d.id.abx.split('\n').map(l=>`    ${l}`).join('\n')}\n`;
+  if(d.id.drugLevels) t+=`  Drug Levels: ${d.id.drugLevels}\n`;
+
+  t+=`\n[5. GI & NUTRITION]\n`;
+  if(d.gi.feeding){
+    let f=`  Feeding: ${d.gi.feeding}`;
+    if(d.gi.feeding==='NPO'&&d.gi.npoReason) f+=` (${d.gi.npoReason})`;
+    if(d.gi.feeding==='Enteral'&&d.gi.enteral) f+=` — ${d.gi.enteral}`;
+    if(d.gi.feeding==='TPN'&&d.gi.tpnCal) f+=` — ${d.gi.tpnCal} kcal/24h`;
+    t+=f+'\n';
+  }
+  if(d.gi.bowel) t+=`  Bowel Motion: ${d.gi.bowel}\n`;
+  if(d.gi.ast||d.gi.alt) t+=`  LFTs: AST ${d.gi.ast||'—'} / ALT ${d.gi.alt||'—'} | T.Bil ${d.gi.tbil||'—'} / D.Bil ${d.gi.dbil||'—'} | Albumin ${d.gi.albumin||'—'}\n`;
+  if(d.gi.amylase||d.gi.lipase) t+=`  Amylase: ${d.gi.amylase||'—'}   Lipase: ${d.gi.lipase||'—'}\n`;
+  if(d.gi.abdImaging) t+=`  Imaging: ${d.gi.abdImaging}\n`;
+
+  t+=`\n[6. RENAL]\n`;
+  if(d.renal.uop||d.renal.fluidIn||d.renal.fluidOut) t+=`  UOP: ${d.renal.uop||'—'} mL/hr   Fluid: In ${d.renal.fluidIn||'—'} / Out ${d.renal.fluidOut||'—'} mL\n`;
+  if(d.renal.cr||d.renal.na) t+=`  Cr: ${d.renal.cr||'—'}  BUN: ${d.renal.bun||'—'}  Na: ${d.renal.na||'—'}  K: ${d.renal.k||'—'}\n`;
+  if(d.renal.diuretics) t+=`  Diuretics: ${d.renal.diuretics}\n`;
+  if(d.renal.crrtMode) t+=`  CRRT/HD: ${d.renal.crrtMode} | UF: ${d.renal.uf||'—'}\n`;
+
+  t+=`\n[7. HEMATOLOGY]\n`;
+  if(d.heme.hb||d.heme.plt) t+=`  CBC: Hb ${d.heme.hb||'—'} | Plt ${d.heme.plt||'—'} | INR ${d.heme.inr||'—'} | PTT ${d.heme.ptt||'—'}\n`;
+  if(d.heme.bleeding) t+=`  Bleeding: ${d.heme.bleeding}\n`;
+  if(d.heme.anticoagDose) t+=`  Anticoag Dose: ${d.heme.anticoagDose}\n`;
+
+  t+=`\n[8. ENDOCRINE]\n`;
+  if(d.endo.glucose) t+=`  Glucose: ${d.endo.glucose}${d.endo.insulinReg?' | Insulin: '+d.endo.insulinReg:''}\n`;
+  if(d.endo.steroidDose) t+=`  Steroids: ${d.endo.steroidDose}\n`;
+  if(d.endo.thyroidDose) t+=`  L-Thyroxine: ${d.endo.thyroidDose}\n`;
+
+  t+=`\n[9. EXTREMITIES]\n`;
+  if(d.ext.pulses) t+=`  Pulses: ${d.ext.pulses}   Cap Refill: ${d.ext.capRefill||'—'}\n`;
+
+  t+=section('V. ASSESSMENT & PLAN');
+  if(d.plan.problems.length){ t+=`Problem List:\n`; d.plan.problems.forEach((p,i)=>t+=`  ${i+1}. ${p}\n`); }
+  t+=`\nDaily Plan:\n`;
+  if(d.plan.neuro) t+=`  Neuro    : ${d.plan.neuro}\n`;
+  if(d.plan.cvs)   t+=`  CVS      : ${d.plan.cvs}\n`;
+  if(d.plan.resp)  t+=`  Resp     : ${d.plan.resp}\n`;
+  if(d.plan.id)    t+=`  ID       : ${d.plan.id}\n`;
+  if(d.plan.gi)    t+=`  GI/Renal : ${d.plan.gi}\n`;
+  if(d.plan.other) t+=`  Other    : ${d.plan.other}\n`;
+  t+=`\n${'─'.repeat(50)}\n`;
+  t+=`Signed: Dr. ___________________   Date: ${d.meta.date||'___'}\n`;
+  return t;
+}
+
+// ────────────────────────────────────────────────
+// HIS MODAL
+// ────────────────────────────────────────────────
+function showHISModal(){
+  const d = collectData();
+  document.getElementById('his-text').textContent = generateHIS(d);
+  document.getElementById('his-modal').classList.add('open');
+}
+function closeHIS(){ document.getElementById('his-modal').classList.remove('open'); }
+async function copyHIS(){
+  const text = document.getElementById('his-text').textContent;
+  try{ await navigator.clipboard.writeText(text); toast('✓ Copied to clipboard'); }
+  catch(e){ toast('Select text manually and copy'); }
+}
+
+// ────────────────────────────────────────────────
+// SAVE / LOAD
+// ────────────────────────────────────────────────
+function getNotes(){ try{ return JSON.parse(localStorage.getItem('icu-notes')||'[]'); }catch(e){ return []; } }
+function putNotes(arr){ localStorage.setItem('icu-notes',JSON.stringify(arr)); }
+
+function saveNote(){
+  const d = collectData();
+  const name = d.meta.name || 'Unnamed Patient';
+  const mrn  = d.meta.mrn  || '—';
+  const date = d.meta.date || new Date().toISOString().slice(0,10);
+  const id   = Date.now();
+  const notes = getNotes();
+  notes.unshift({ id, name, mrn, date, data: d });
+  // Keep last 50
+  if(notes.length>50) notes.splice(50);
+  putNotes(notes);
+  toast('✓ Saved — '+name);
+}
+
+function renderSaved(){
+  const notes = getNotes();
+  const list  = document.getElementById('saved-list');
+  if(!notes.length){ list.innerHTML='<div class="empty-state">No saved notes yet.</div>'; return; }
+  list.innerHTML = notes.map(n=>`
+    <div class="note-card">
+      <div class="note-info">
+        <div class="note-name">${n.name}</div>
+        <div class="note-meta">MRN: ${n.mrn} &nbsp;·&nbsp; ${n.date}</div>
+      </div>
+      <div class="note-actions">
+        <button class="btn btn-cyan" onclick="loadNote(${n.id})">Load</button>
+        <button class="btn btn-danger" onclick="deleteNote(${n.id})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadNote(id){
+  const notes = getNotes();
+  const note  = notes.find(n=>n.id===id);
+  if(!note) return;
+  // Simple: populate fields
+  const d = note.data;
+  const s = (fieldId,val)=>{ const el=document.getElementById(fieldId); if(el&&val) el.value=val; };
+  s('f-name',d.meta.name); s('f-mrn',d.meta.mrn); s('f-date',d.meta.date); s('f-bed',d.meta.bed);
+  s('f-reason',d.overview.reason); s('f-hpi1',d.overview.hpi[0]); s('f-hpi2',d.overview.hpi[1]); s('f-hpi3',d.overview.hpi[2]);
+  s('f-pmhx-other',d.overview.pmhxOther);
+  s('f-gcs',d.neuro.gcs); s('f-pupils',d.neuro.pupils); s('f-rass-target',d.neuro.rassTarget); s('f-rass-current',d.neuro.rassCurrent);
+  s('f-limb-detail',d.neuro.limbDetail); s('f-brain-findings',d.neuro.brainFindings); s('f-eeg',d.neuro.eeg); s('f-cns-drugs',d.neuro.cnsDrugs);
+  s('f-hr',d.cvs.hr); s('f-map',d.cvs.map); s('f-hem-other',d.cvs.hemOther); s('f-lactate',d.cvs.lactate); s('f-bnp',d.cvs.bnp); s('f-troponin',d.cvs.troponin);
+  s('f-ecg',d.cvs.ecg); s('f-echo',d.cvs.echo); s('f-cardiac-drugs',d.cvs.cardiacDrugs); s('f-cvs-other',d.cvs.cvsOther);
+  s('f-va-flow',d.cvs.vaFlow); s('f-va-fio2',d.cvs.vaFio2); s('f-va-sweep',d.cvs.vaSweep);
+  s('f-chest-exam',d.resp.chestExam); s('f-o2-rate',d.resp.o2Rate); s('f-hfnc-fio2',d.resp.hfncFio2); s('f-hfnc-flow',d.resp.hfncFlow);
+  s('f-niv-psv',d.resp.nivPSV); s('f-niv-peep',d.resp.nivPEEP); s('f-ett',d.resp.ett);
+  s('f-mv-day',d.resp.mvDay); s('f-mv-mode',d.resp.mvMode); s('f-mv-vt',d.resp.mvVt); s('f-mv-rr',d.resp.mvRR); s('f-mv-peep',d.resp.mvPEEP); s('f-mv-fio2',d.resp.mvFio2);
+  s('f-ph',d.resp.ph); s('f-pco2',d.resp.pco2); s('f-po2',d.resp.po2); s('f-hco3',d.resp.hco3); s('f-pf',d.resp.pf); s('f-rox',d.resp.rox); s('f-hacor',d.resp.hacor);
+  s('f-cxr',d.resp.cxr); s('f-resp-other2',d.resp.respOther); s('f-vv-flow',d.resp.vvFlow); s('f-vv-fio2',d.resp.vvFio2); s('f-vv-sweep',d.resp.vvSweep);
+  s('f-temp',d.id.temp); s('f-wbc',d.id.wbc); s('f-pct',d.id.pct); s('f-crp',d.id.crp); s('f-cultures',d.id.cultures); s('f-mdro-spec',d.id.mdroSpec); s('f-abx',d.id.abx); s('f-drug-levels',d.id.drugLevels);
+  s('f-npo-reason',d.gi.npoReason); s('f-enteral',d.gi.enteral); s('f-tpn-cal',d.gi.tpnCal);
+  s('f-ast',d.gi.ast); s('f-alt',d.gi.alt); s('f-tbil',d.gi.tbil); s('f-dbil',d.gi.dbil); s('f-albumin',d.gi.albumin); s('f-amylase',d.gi.amylase); s('f-lipase',d.gi.lipase); s('f-abd-imaging',d.gi.abdImaging);
+  s('f-uop',d.renal.uop); s('f-fluid-in',d.renal.fluidIn); s('f-fluid-out',d.renal.fluidOut); s('f-cr',d.renal.cr); s('f-bun',d.renal.bun); s('f-na',d.renal.na); s('f-k',d.renal.k); s('f-diuretics',d.renal.diuretics); s('f-crrt-mode',d.renal.crrtMode); s('f-uf',d.renal.uf);
+  s('f-hb',d.heme.hb); s('f-plt',d.heme.plt); s('f-inr',d.heme.inr); s('f-ptt',d.heme.ptt); s('f-anticoag-dose',d.heme.anticoagDose); s('f-antiplat-other',d.heme.antiplateletOther);
+  s('f-glucose',d.endo.glucose); s('f-insulin-reg',d.endo.insulinReg); s('f-steroid-dose',d.endo.steroidDose); s('f-thyroid-dose',d.endo.thyroidDose);
+  s('f-plan-neuro',d.plan.neuro); s('f-plan-cvs',d.plan.cvs); s('f-plan-resp',d.plan.resp); s('f-plan-id',d.plan.id); s('f-plan-gi',d.plan.gi); s('f-plan-other',d.plan.other);
+  // Vasopressor doses
+  if(d.cvs.vasopressors) d.cvs.vasopressors.forEach(vp=>{ s(`f-dose-${vp.name.toLowerCase().slice(0,5)}`,vp.dose); });
+  // Problems
+  const pl = document.getElementById('problem-list');
+  pl.innerHTML='';
+  (d.plan.problems.length?d.plan.problems:['','']).forEach((p,i)=>{
+    const row=document.createElement('div'); row.className='problem-row';
+    row.innerHTML=`<span class="problem-num">${i+1}</span><input class="field-input" value="${p}" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/>`;
+    pl.appendChild(row);
+  });
+  showPage('note');
+  toast('✓ Note loaded');
+  saveProgress();
+}
+
+function deleteNote(id){
+  if(!confirm('Delete this note?')) return;
+  putNotes(getNotes().filter(n=>n.id!==id));
+  renderSaved();
+  toast('Deleted');
+}
+
+// ────────────────────────────────────────────────
+// NEW / RESET
+// ────────────────────────────────────────────────
+function newNote(){
+  if(!confirm('Start a new note? Unsaved data will be lost.')) return;
+  resetForm();
+}
+function confirmReset(){
+  if(!confirm('Clear all fields?')) return;
+  resetForm();
+}
+function resetForm(){
+  document.querySelectorAll('#page-note input[type=text], #page-note input[type=date], #page-note textarea, #page-note input:not([type])').forEach(el=>el.value='');
+  document.querySelectorAll('#page-note input[type=checkbox]').forEach(el=>{ el.checked=false; toggleCB(el); });
+  document.querySelectorAll('.radio-item').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.conditional').forEach(el=>el.style.display='none');
+  const pl=document.getElementById('problem-list');
+  pl.innerHTML='';
+  for(let i=1;i<=4;i++){
+    const row=document.createElement('div'); row.className='problem-row';
+    row.innerHTML=`<span class="problem-num">${i}</span><input class="field-input" placeholder="Problem / abnormal parameter" oninput="saveProgress()"/>`;
+    pl.appendChild(row);
+  }
+  saveProgress();
+  toast('Form cleared');
+}
+
+// ────────────────────────────────────────────────
+// SERVICE WORKER
+// ────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+// ────────────────────────────────────────────────
+// INIT
+// ────────────────────────────────────────────────
+document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+showTab('overview');
+saveProgress();
+</script>
+</body>
+</html>
